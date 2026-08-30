@@ -77,7 +77,7 @@ export function ProductStudio({ lowPower }: { lowPower: boolean }) {
       <CinematicCamera />
       <LightingSystem />
 
-      <group position={[0, 0.15, 0]}>
+      <group position={[0, 0.04, 0]} scale={0.55}>
         <SneakerModel />
         <TechLabels />
       </group>
