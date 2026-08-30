@@ -143,26 +143,26 @@ export function makeHeel() {
   });
 }
 
-/** Tongue: padded slab lying on the instep. */
+/** Tongue: padded slab lying along the instep. */
 export function makeTongue() {
   const s = new THREE.Shape();
-  s.moveTo(0.62, 0.6);
-  s.lineTo(-0.12, 1.12);
-  s.quadraticCurveTo(-0.24, 1.24, -0.34, 1.16);
-  s.lineTo(0.5, 0.5);
-  s.quadraticCurveTo(0.64, 0.48, 0.62, 0.6);
-  return taper(extrude(s, 0.5, 0.035), { width: 0.27, toe: 0.1 });
+  s.moveTo(0.6, 0.56);
+  s.quadraticCurveTo(0.12, 0.82, -0.18, 1.0);
+  s.quadraticCurveTo(-0.32, 1.08, -0.38, 0.98);
+  s.quadraticCurveTo(0.04, 0.72, 0.5, 0.46);
+  s.quadraticCurveTo(0.62, 0.44, 0.6, 0.56);
+  return taper(extrude(s, 0.48, 0.03), { width: 0.25, toe: 0.1 });
 }
 
-/** Toe cap overlay. */
+/** Toe cap overlay: low, rounded, wrapping the front of the upper. */
 export function makeToeCap() {
   const s = new THREE.Shape();
-  s.moveTo(1.46, 0.27);
-  s.quadraticCurveTo(1.53, 0.44, 1.22, 0.54);
-  s.lineTo(0.82, 0.63);
-  s.lineTo(0.78, 0.3);
-  s.quadraticCurveTo(1.1, 0.26, 1.46, 0.27);
-  return taper(extrude(s, 0.85, 0.02), { width: 0.421, toe: 0.34, crown: 0.3, crownFrom: 0.4 });
+  s.moveTo(1.44, 0.24);
+  s.quadraticCurveTo(1.52, 0.4, 1.22, 0.5);
+  s.quadraticCurveTo(0.98, 0.55, 0.74, 0.52);
+  s.lineTo(0.72, 0.27);
+  s.quadraticCurveTo(1.08, 0.24, 1.44, 0.24);
+  return taper(extrude(s, 0.84, 0.02), { width: 0.418, toe: 0.34, crown: 0.42, crownFrom: 0.42 });
 }
 
 /** Tread blocks for the outsole. */
