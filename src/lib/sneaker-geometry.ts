@@ -189,10 +189,10 @@ export const CUSHION_PODS: Array<[number, number, number]> = [
 
 /** Eyelet + lace anchor points along the instep line. */
 export const LACE_ROWS: Array<[number, number]> = [
-  [0.66, 0.62],
-  [0.42, 0.79],
-  [0.18, 0.95],
-  [-0.06, 1.1],
+  [0.62, 0.57],
+  [0.38, 0.71],
+  [0.14, 0.85],
+  [-0.12, 0.96],
 ];
 
 export function laceHalfWidth(x: number) {
