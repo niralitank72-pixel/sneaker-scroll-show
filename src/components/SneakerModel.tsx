@@ -253,16 +253,16 @@ export function SneakerModel() {
         <mesh
           geometry={geo.lace}
           material={m.lace}
-          position={[-0.24, 1.14, 0.1]}
-          scale={[1, 0.4, 1]}
-          rotation={[0.5, 0, 1.1]}
+          position={[-0.26, 0.98, 0.08]}
+          scale={[1, 0.26, 1]}
+          rotation={[0.5, 0, 1.35]}
         />
         <mesh
           geometry={geo.lace}
           material={m.lace}
-          position={[-0.2, 1.12, -0.12]}
-          scale={[1, 0.36, 1]}
-          rotation={[-0.5, 0, 1.3]}
+          position={[-0.22, 0.96, -0.1]}
+          scale={[1, 0.24, 1]}
+          rotation={[-0.5, 0, 1.5]}
         />
       </group>
 
