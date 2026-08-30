@@ -33,11 +33,11 @@ export function ParticleSystem({ count = 500 }: Props) {
     const t = performance.now() / 1000;
     const p = experienceState.progress;
 
-    const pos = geometry.attributes.position as THREE.BufferAttribute;
+    const pos = geometry.attributes['position'] as THREE.BufferAttribute;
     for (let i = 0; i < count; i++) {
-      const y = pos.getY(i) + dt * seeds[i * 3 + 1] * 0.12;
+      const y = pos.getY(i) + dt * seeds[i * 3 + 1]! * 0.12;
       pos.setY(i, y > 4.6 ? -0.8 : y);
-      pos.setX(i, pos.getX(i) + Math.sin(t * 0.25 + seeds[i * 3 + 2]) * dt * 0.05);
+      pos.setX(i, pos.getX(i) + Math.sin(t * 0.25 + seeds[i * 3 + 2]!) * dt * 0.05);
     }
     pos.needsUpdate = true;
 
