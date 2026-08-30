@@ -95,49 +95,48 @@ export function makeInsole() {
   return taper(extrude(s, 0.78), { width: 0.385, toe: 0.34 });
 }
 
-/** Upper: high-top shell. */
+/** Upper: mid-top shell with a rounded, dipped collar. */
 export function makeUpper() {
   const s = new THREE.Shape();
-  s.moveTo(-1.5, 0.3);
-  s.lineTo(1.46, 0.26);
-  s.quadraticCurveTo(1.52, 0.42, 1.24, 0.52);
-  s.quadraticCurveTo(0.72, 0.66, 0.36, 0.82);
-  s.lineTo(-0.16, 1.16);
-  s.quadraticCurveTo(-0.3, 1.3, -0.5, 1.3);
-  s.lineTo(-1.06, 1.3);
-  s.quadraticCurveTo(-1.36, 1.3, -1.44, 1.02);
-  s.lineTo(-1.54, 0.56);
-  s.quadraticCurveTo(-1.58, 0.34, -1.5, 0.3);
+  s.moveTo(-1.48, 0.28);
+  s.lineTo(1.44, 0.24);
+  s.quadraticCurveTo(1.52, 0.4, 1.22, 0.5);
+  s.quadraticCurveTo(0.74, 0.6, 0.42, 0.74);
+  s.quadraticCurveTo(0.06, 0.9, -0.2, 1.02);
+  s.quadraticCurveTo(-0.42, 1.12, -0.66, 1.0);
+  s.quadraticCurveTo(-0.9, 0.9, -1.06, 1.06);
+  s.quadraticCurveTo(-1.3, 1.28, -1.42, 1.0);
+  s.lineTo(-1.52, 0.52);
+  s.quadraticCurveTo(-1.56, 0.3, -1.48, 0.28);
   return taper(extrude(s, 0.84), {
     width: 0.415,
     toe: 0.34,
-    crown: 0.34,
-    crownFrom: 0.5,
+    crown: 0.42,
+    crownFrom: 0.42,
   });
 }
 
 /** Collar ring at the ankle opening. */
 export function makeCollar() {
-  const geo = new THREE.TorusGeometry(0.3, 0.055, 12, 40);
+  const geo = new THREE.TorusGeometry(0.3, 0.05, 12, 40);
   geo.rotateX(Math.PI / 2);
-  geo.rotateZ(-0.52);
-  geo.scale(1.35, 1, 0.78);
-  geo.translate(-0.62, 1.2, 0);
+  geo.rotateZ(-0.38);
+  geo.scale(1.5, 1, 0.62);
+  geo.translate(-0.62, 1.02, 0);
   return geo;
 }
 
-/** Heel counter panel. */
+/** Heel counter panel, hugging the back of the upper. */
 export function makeHeel() {
   const s = new THREE.Shape();
-  s.moveTo(-1.5, 0.34);
-  s.quadraticCurveTo(-0.86, 0.36, -0.72, 0.62);
-  s.lineTo(-0.86, 1.14);
-  s.quadraticCurveTo(-1.0, 1.3, -1.2, 1.28);
-  s.quadraticCurveTo(-1.44, 1.24, -1.49, 0.94);
-  s.lineTo(-1.56, 0.5);
-  s.quadraticCurveTo(-1.57, 0.36, -1.5, 0.34);
-  return taper(extrude(s, 0.88, 0.03), {
-    width: 0.442,
+  s.moveTo(-1.48, 0.32);
+  s.quadraticCurveTo(-0.92, 0.34, -0.8, 0.62);
+  s.quadraticCurveTo(-0.9, 0.84, -1.02, 0.98);
+  s.quadraticCurveTo(-1.24, 1.18, -1.38, 0.96);
+  s.lineTo(-1.5, 0.5);
+  s.quadraticCurveTo(-1.54, 0.34, -1.48, 0.32);
+  return taper(extrude(s, 0.86, 0.028), {
+    width: 0.434,
     toe: 0,
     crown: 0.3,
     crownFrom: 0.5,
