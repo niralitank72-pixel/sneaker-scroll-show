@@ -37,7 +37,7 @@ function Label({ def }: { def: LabelDef }) {
 
   return (
     <group ref={group} position={def.position}>
-      <Html center distanceFactor={6} zIndexRange={[10, 0]} style={{ pointerEvents: "none" }}>
+      <Html center distanceFactor={2.6} zIndexRange={[10, 0]} style={{ pointerEvents: "none" }}>
         <div ref={el} className="tech-label">
           <span className="tech-label__meta">{def.meta}</span>
           <span className="tech-label__line" />

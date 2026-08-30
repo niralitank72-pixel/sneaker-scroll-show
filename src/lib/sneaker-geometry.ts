@@ -21,7 +21,7 @@ type TaperOpts = {
 };
 
 function taper(geo: THREE.BufferGeometry, o: TaperOpts) {
-  const pos = geo.attributes.position as THREE.BufferAttribute;
+  const pos = geo.attributes['position']! as THREE.BufferAttribute;
   const len = o.len ?? 1.6;
   for (let i = 0; i < pos.count; i++) {
     const x = pos.getX(i);
@@ -95,75 +95,74 @@ export function makeInsole() {
   return taper(extrude(s, 0.78), { width: 0.385, toe: 0.34 });
 }
 
-/** Upper: high-top shell. */
+/** Upper: mid-top shell with a rounded, dipped collar. */
 export function makeUpper() {
   const s = new THREE.Shape();
-  s.moveTo(-1.5, 0.3);
-  s.lineTo(1.46, 0.26);
-  s.quadraticCurveTo(1.52, 0.42, 1.24, 0.52);
-  s.quadraticCurveTo(0.72, 0.66, 0.36, 0.82);
-  s.lineTo(-0.16, 1.16);
-  s.quadraticCurveTo(-0.3, 1.3, -0.5, 1.3);
-  s.lineTo(-1.06, 1.3);
-  s.quadraticCurveTo(-1.36, 1.3, -1.44, 1.02);
-  s.lineTo(-1.54, 0.56);
-  s.quadraticCurveTo(-1.58, 0.34, -1.5, 0.3);
+  s.moveTo(-1.48, 0.28);
+  s.lineTo(1.44, 0.24);
+  s.quadraticCurveTo(1.52, 0.4, 1.22, 0.5);
+  s.quadraticCurveTo(0.74, 0.6, 0.42, 0.74);
+  s.quadraticCurveTo(0.06, 0.9, -0.2, 1.02);
+  s.quadraticCurveTo(-0.42, 1.12, -0.66, 1.0);
+  s.quadraticCurveTo(-0.9, 0.9, -1.06, 1.06);
+  s.quadraticCurveTo(-1.3, 1.28, -1.42, 1.0);
+  s.lineTo(-1.52, 0.52);
+  s.quadraticCurveTo(-1.56, 0.3, -1.48, 0.28);
   return taper(extrude(s, 0.84), {
     width: 0.415,
     toe: 0.34,
-    crown: 0.34,
-    crownFrom: 0.5,
+    crown: 0.42,
+    crownFrom: 0.42,
   });
 }
 
 /** Collar ring at the ankle opening. */
 export function makeCollar() {
-  const geo = new THREE.TorusGeometry(0.3, 0.055, 12, 40);
+  const geo = new THREE.TorusGeometry(0.3, 0.05, 12, 40);
   geo.rotateX(Math.PI / 2);
-  geo.rotateZ(-0.52);
-  geo.scale(1.35, 1, 0.78);
-  geo.translate(-0.62, 1.2, 0);
+  geo.rotateZ(-0.38);
+  geo.scale(1.5, 1, 0.62);
+  geo.translate(-0.62, 1.02, 0);
   return geo;
 }
 
-/** Heel counter panel. */
+/** Heel counter panel, hugging the back of the upper. */
 export function makeHeel() {
   const s = new THREE.Shape();
-  s.moveTo(-1.5, 0.34);
-  s.quadraticCurveTo(-0.86, 0.36, -0.72, 0.62);
-  s.lineTo(-0.86, 1.14);
-  s.quadraticCurveTo(-1.0, 1.3, -1.2, 1.28);
-  s.quadraticCurveTo(-1.44, 1.24, -1.49, 0.94);
-  s.lineTo(-1.56, 0.5);
-  s.quadraticCurveTo(-1.57, 0.36, -1.5, 0.34);
-  return taper(extrude(s, 0.88, 0.03), {
-    width: 0.442,
+  s.moveTo(-1.48, 0.32);
+  s.quadraticCurveTo(-0.92, 0.34, -0.8, 0.62);
+  s.quadraticCurveTo(-0.9, 0.84, -1.02, 0.98);
+  s.quadraticCurveTo(-1.24, 1.18, -1.38, 0.96);
+  s.lineTo(-1.5, 0.5);
+  s.quadraticCurveTo(-1.54, 0.34, -1.48, 0.32);
+  return taper(extrude(s, 0.86, 0.028), {
+    width: 0.434,
     toe: 0,
     crown: 0.3,
     crownFrom: 0.5,
   });
 }
 
-/** Tongue: padded slab lying on the instep. */
+/** Tongue: padded slab lying along the instep. */
 export function makeTongue() {
   const s = new THREE.Shape();
-  s.moveTo(0.62, 0.6);
-  s.lineTo(-0.12, 1.12);
-  s.quadraticCurveTo(-0.24, 1.24, -0.34, 1.16);
-  s.lineTo(0.5, 0.5);
-  s.quadraticCurveTo(0.64, 0.48, 0.62, 0.6);
-  return taper(extrude(s, 0.5, 0.035), { width: 0.27, toe: 0.1 });
+  s.moveTo(0.6, 0.56);
+  s.quadraticCurveTo(0.12, 0.82, -0.18, 1.0);
+  s.quadraticCurveTo(-0.32, 1.08, -0.38, 0.98);
+  s.quadraticCurveTo(0.04, 0.72, 0.5, 0.46);
+  s.quadraticCurveTo(0.62, 0.44, 0.6, 0.56);
+  return taper(extrude(s, 0.48, 0.03), { width: 0.25, toe: 0.1 });
 }
 
-/** Toe cap overlay. */
+/** Toe cap overlay: low, rounded, wrapping the front of the upper. */
 export function makeToeCap() {
   const s = new THREE.Shape();
-  s.moveTo(1.46, 0.27);
-  s.quadraticCurveTo(1.53, 0.44, 1.22, 0.54);
-  s.lineTo(0.82, 0.63);
-  s.lineTo(0.78, 0.3);
-  s.quadraticCurveTo(1.1, 0.26, 1.46, 0.27);
-  return taper(extrude(s, 0.85, 0.02), { width: 0.421, toe: 0.34, crown: 0.3, crownFrom: 0.4 });
+  s.moveTo(1.44, 0.24);
+  s.quadraticCurveTo(1.52, 0.4, 1.22, 0.5);
+  s.quadraticCurveTo(0.98, 0.55, 0.74, 0.52);
+  s.lineTo(0.72, 0.27);
+  s.quadraticCurveTo(1.08, 0.24, 1.44, 0.24);
+  return taper(extrude(s, 0.84, 0.02), { width: 0.418, toe: 0.34, crown: 0.42, crownFrom: 0.42 });
 }
 
 /** Tread blocks for the outsole. */
@@ -190,10 +189,10 @@ export const CUSHION_PODS: Array<[number, number, number]> = [
 
 /** Eyelet + lace anchor points along the instep line. */
 export const LACE_ROWS: Array<[number, number]> = [
-  [0.66, 0.62],
-  [0.42, 0.79],
-  [0.18, 0.95],
-  [-0.06, 1.1],
+  [0.62, 0.57],
+  [0.38, 0.71],
+  [0.14, 0.85],
+  [-0.12, 0.96],
 ];
 
 export function laceHalfWidth(x: number) {
