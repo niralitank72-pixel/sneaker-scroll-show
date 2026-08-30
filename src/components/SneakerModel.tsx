@@ -223,7 +223,7 @@ export function SneakerModel() {
       <group ref={laces}>
         {LACE_ROWS.map(([x, y], i) => {
           const w = laceHalfWidth(x) + 0.05;
-          const next = LACE_ROWS[Math.min(i + 1, LACE_ROWS.length - 1)];
+          const next = LACE_ROWS[Math.min(i + 1, LACE_ROWS.length - 1)]!;
           const dx = next[0] - x;
           const dy = next[1] - y;
           const len = Math.hypot(dx, dy, w * 2) || 0.001;

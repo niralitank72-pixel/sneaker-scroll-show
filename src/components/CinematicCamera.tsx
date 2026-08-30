@@ -36,8 +36,9 @@ const KEYS: Key[] = [
 
 export function CinematicCamera() {
   const { camera } = useThree();
-  const pos = useRef(new THREE.Vector3(...KEYS[0].pos));
-  const look = useRef(new THREE.Vector3(...KEYS[0].look));
+  const first = KEYS[0]!;
+  const pos = useRef(new THREE.Vector3(...first.pos));
+  const look = useRef(new THREE.Vector3(...first.look));
   const tmpPos = useMemo(() => new THREE.Vector3(), []);
   const tmpLook = useMemo(() => new THREE.Vector3(), []);
 
@@ -46,9 +47,9 @@ export function CinematicCamera() {
     const p = experienceState.progress;
 
     let i = 0;
-    while (i < KEYS.length - 2 && p > KEYS[i + 1].t) i++;
-    const a = KEYS[i];
-    const b = KEYS[i + 1];
+    while (i < KEYS.length - 2 && p > KEYS[i + 1]!.t) i++;
+    const a = KEYS[i]!;
+    const b = KEYS[i + 1]!;
     const k = smoothstep(a.t, b.t, p);
 
     tmpPos.set(...a.pos).lerp(tmpLook.set(...b.pos), k);

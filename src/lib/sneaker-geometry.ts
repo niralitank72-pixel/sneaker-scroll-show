@@ -21,7 +21,7 @@ type TaperOpts = {
 };
 
 function taper(geo: THREE.BufferGeometry, o: TaperOpts) {
-  const pos = geo.attributes.position as THREE.BufferAttribute;
+  const pos = geo.attributes['position']! as THREE.BufferAttribute;
   const len = o.len ?? 1.6;
   for (let i = 0; i < pos.count; i++) {
     const x = pos.getX(i);
