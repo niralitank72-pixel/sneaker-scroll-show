@@ -16,33 +16,34 @@ import {
   makeUpper,
 } from "../lib/sneaker-geometry";
 import { band, damp, experienceState, smoothstep } from "../state/experienceState";
-
-const ACCENT = "#4d8cff";
+import { COLORWAYS } from "../data/product";
+import { readUi } from "../state/uiStore";
 
 function useMaterials() {
   return useMemo(() => {
+    const c = COLORWAYS[0]!.colors;
     const mk = (o: THREE.MeshStandardMaterialParameters) => new THREE.MeshStandardMaterial(o);
     return {
-      upper: mk({ color: "#14161c", roughness: 0.82, metalness: 0.08, emissive: ACCENT, emissiveIntensity: 0 }),
-      toe: mk({ color: "#f2f3f5", roughness: 0.55, metalness: 0.05, emissive: ACCENT, emissiveIntensity: 0 }),
-      heel: mk({ color: "#20242e", roughness: 0.42, metalness: 0.45, emissive: ACCENT, emissiveIntensity: 0 }),
-      collar: mk({ color: "#2a2f3a", roughness: 0.9, metalness: 0.02 }),
-      tongue: mk({ color: "#1b1f27", roughness: 0.95, metalness: 0.02, emissive: ACCENT, emissiveIntensity: 0 }),
-      midsole: mk({ color: "#eceef1", roughness: 0.62, metalness: 0.02, emissive: ACCENT, emissiveIntensity: 0 }),
-      insole: mk({ color: "#c9ced8", roughness: 0.75, metalness: 0.04, emissive: ACCENT, emissiveIntensity: 0 }),
-      outsole: mk({ color: "#0d0f14", roughness: 0.68, metalness: 0.1, emissive: ACCENT, emissiveIntensity: 0 }),
-      tread: mk({ color: "#161a21", roughness: 0.72, metalness: 0.08 }),
+      upper: mk({ color: c.upper, roughness: 0.82, metalness: 0.08, emissive: c.glow, emissiveIntensity: 0 }),
+      toe: mk({ color: c.toe, roughness: 0.55, metalness: 0.05, emissive: c.glow, emissiveIntensity: 0 }),
+      heel: mk({ color: c.heel, roughness: 0.42, metalness: 0.45, emissive: c.glow, emissiveIntensity: 0 }),
+      collar: mk({ color: c.collar, roughness: 0.9, metalness: 0.02 }),
+      tongue: mk({ color: c.tongue, roughness: 0.95, metalness: 0.02, emissive: c.glow, emissiveIntensity: 0 }),
+      midsole: mk({ color: c.midsole, roughness: 0.62, metalness: 0.02, emissive: c.glow, emissiveIntensity: 0 }),
+      insole: mk({ color: c.insole, roughness: 0.75, metalness: 0.04, emissive: c.glow, emissiveIntensity: 0 }),
+      outsole: mk({ color: c.outsole, roughness: 0.68, metalness: 0.1, emissive: c.glow, emissiveIntensity: 0 }),
+      tread: mk({ color: c.outsole, roughness: 0.72, metalness: 0.08 }),
       cushion: mk({
         color: "#8fbaff",
         roughness: 0.18,
         metalness: 0.0,
         transparent: true,
         opacity: 0.72,
-        emissive: ACCENT,
+        emissive: c.glow,
         emissiveIntensity: 0.8,
       }),
-      accent: mk({ color: "#dfe6f2", roughness: 0.3, metalness: 0.7, emissive: ACCENT, emissiveIntensity: 0.5 }),
-      lace: mk({ color: "#e8eaee", roughness: 0.95, metalness: 0.0 }),
+      accent: mk({ color: c.accent, roughness: 0.3, metalness: 0.7, emissive: c.glow, emissiveIntensity: 0.5 }),
+      lace: mk({ color: c.lace, roughness: 0.95, metalness: 0.0 }),
       eyelet: mk({ color: "#aeb6c4", roughness: 0.25, metalness: 0.9 }),
     };
   }, []);
@@ -62,6 +63,7 @@ export function SneakerModel() {
   const energyLight = useRef<THREE.PointLight>(null!);
 
   const m = useMaterials();
+  const target = useMemo(() => new THREE.Color(), []);
   const geo = useMemo(
     () => ({
       outsole: makeOutsole(),
@@ -87,24 +89,44 @@ export function SneakerModel() {
     const dt = Math.min(rawDelta, 0.05);
     const p = experienceState.progress;
     const t = performance.now() / 1000;
+    const ui = readUi();
 
-    // ---- explode factor (out during 04-06, back in during 07) ----
-    const e = smoothstep(0.55, 0.685, p) * (1 - smoothstep(0.902, 0.962, p));
+    // ---- colorway blend (drives every skin in one place) ----
+    const cw = COLORWAYS[ui.colorway] ?? COLORWAYS[0]!;
+    const k = 1 - Math.exp(-6 * dt);
+    const blend = (mat: THREE.MeshStandardMaterial, hex: string) => mat.color.lerp(target.set(hex), k);
+    blend(m.upper, cw.colors.upper);
+    blend(m.toe, cw.colors.toe);
+    blend(m.heel, cw.colors.heel);
+    blend(m.collar, cw.colors.collar);
+    blend(m.tongue, cw.colors.tongue);
+    blend(m.midsole, cw.colors.midsole);
+    blend(m.insole, cw.colors.insole);
+    blend(m.outsole, cw.colors.outsole);
+    blend(m.tread, cw.colors.outsole);
+    blend(m.accent, cw.colors.accent);
+    blend(m.lace, cw.colors.lace);
+    m.cushion.emissive.lerp(target.set(cw.colors.glow), k);
+    m.accent.emissive.lerp(target.set(cw.colors.glow), k);
+    energyLight.current.color.lerp(target.set(cw.colors.glow), k);
+
+    // ---- ACT 04: deconstruct, then rebuild before the colorway act ----
+    const e = smoothstep(0.53, 0.61, p) * (1 - smoothstep(0.72, 0.78, p));
     const ee = e * e * (3 - 2 * e);
 
-    // ---- orientation ----
-    const spin = smoothstep(0.13, 0.4, p);
-    const finalSpin = smoothstep(0.962, 1, p);
-    const targetYaw = -0.55 - Math.PI * 2 * spin - 0.9 * finalSpin;
+    // ---- orientation: one full inspection turn in act 03 ----
+    const spin = smoothstep(0.3, 0.5, p);
+    const settle = smoothstep(0.12, 0.28, p) * 0.35;
+    const finalSpin = smoothstep(0.9, 1, p);
+    const targetYaw = -0.55 - settle - Math.PI * 2 * spin - 0.6 * finalSpin;
     state.current.yaw = damp(state.current.yaw, targetYaw, 6, dt);
 
-    const lift = 0.3 * smoothstep(0.12, 0.26, p) + 0.12 * ee;
+    const lift = 0.3 * smoothstep(0.1, 0.24, p) + 0.12 * ee;
     state.current.lift = damp(state.current.lift, lift, 5, dt);
 
     group.current.rotation.y = state.current.yaw;
-    group.current.rotation.z = 0.03 * Math.sin(t * 0.5) * (1 - ee);
-    group.current.position.y =
-      state.current.lift + Math.sin(t * 0.7) * 0.02 * (1 - ee) - 0.35 * ee;
+    group.current.rotation.z = 0.025 * Math.sin(t * 0.5) * (1 - ee);
+    group.current.position.y = state.current.lift + Math.sin(t * 0.7) * 0.02 * (1 - ee) - 0.35 * ee;
 
     // ---- exploded offsets ----
     outsole.current.position.y = -0.95 * ee;
@@ -118,38 +140,34 @@ export function SneakerModel() {
     laces.current.position.y = 2.3 * ee;
     accents.current.position.y = -0.4 * ee;
 
-    // ---- technology highlights (stage 03) ----
-    const hUpper = band(p, 0.4, 0.442, 0.016) + band(p, 0.705, 0.745, 0.014);
-    const hMid = band(p, 0.442, 0.482, 0.016) + band(p, 0.745, 0.785, 0.014);
-    const hOut = band(p, 0.482, 0.52, 0.016) + band(p, 0.785, 0.82, 0.014);
-    const hHeel = band(p, 0.52, 0.556, 0.016);
+    // ---- zone highlights: scroll bands in act 03, plus the clicked hotspot ----
+    const sel = ui.hotspot;
+    const hUpper = band(p, 0.3, 0.35, 0.014) + (sel === "upper" ? 1 : 0);
+    const hMid = band(p, 0.35, 0.4, 0.014) + band(p, 0.62, 0.68, 0.014) + (sel === "foam" ? 1 : 0);
+    const hOut = band(p, 0.4, 0.45, 0.014) + band(p, 0.68, 0.73, 0.014) + (sel === "sole" ? 1 : 0);
+    const hHeel = band(p, 0.45, 0.5, 0.014) + (sel === "heel" ? 1 : 0);
 
-    // ---- energy sequence (stage 06) ----
-    const en = band(p, 0.818, 0.902, 0.02);
+    // ---- energy pulse carries the colorway act ----
+    const en = band(p, 0.78, 0.9, 0.025);
     const pulse = 0.5 + 0.5 * Math.sin(t * 3.2);
     const sweep = (t * 0.55) % 1;
 
-    m.upper.emissiveIntensity = hUpper * 0.5;
-    m.toe.emissiveIntensity = hUpper * 0.35;
-    m.tongue.emissiveIntensity = hUpper * 0.4;
-    m.midsole.emissiveIntensity = hMid * 0.35 + en * 0.25 * pulse;
-    m.insole.emissiveIntensity = hMid * 0.3;
-    m.outsole.emissiveIntensity = hOut * 0.6;
-    m.heel.emissiveIntensity = hHeel * 0.8;
-    m.cushion.emissiveIntensity = 0.7 + hMid * 1.4 + en * 2.2 * pulse;
-    m.accent.emissiveIntensity = 0.45 + en * 2.4 * pulse + ee * 0.4;
+    m.upper.emissiveIntensity = hUpper * 0.45;
+    m.toe.emissiveIntensity = hUpper * 0.3;
+    m.tongue.emissiveIntensity = hUpper * 0.35;
+    m.midsole.emissiveIntensity = hMid * 0.32 + en * 0.22 * pulse;
+    m.insole.emissiveIntensity = hMid * 0.28;
+    m.outsole.emissiveIntensity = hOut * 0.55;
+    m.heel.emissiveIntensity = hHeel * 0.75;
+    m.cushion.emissiveIntensity = 0.7 + hMid * 1.4 + en * 2 * pulse;
+    m.accent.emissiveIntensity = 0.45 + en * 2.2 * pulse + ee * 0.4;
 
-    // cushioning compression + sole flex during energy
-    const squash = 1 - 0.06 * en * pulse;
+    const squash = 1 - 0.05 * en * pulse;
     midsole.current.scale.y = damp(midsole.current.scale.y, squash, 8, dt);
-    cushion.current.scale.setScalar(1 + 0.12 * en * pulse);
+    cushion.current.scale.setScalar(1 + 0.1 * en * pulse);
 
-    // light travelling heel -> toe
     energyLight.current.intensity = en * 9;
     energyLight.current.position.set(-1.5 + sweep * 3.1, 0.28, 0);
-
-    // subtle idle breathing on laces during energy
-    laces.current.rotation.z = 0.03 * en * Math.sin(t * 2.4);
   });
 
   const tread = geo.tread;
@@ -172,13 +190,7 @@ export function SneakerModel() {
       {/* ---------- CUSHIONING PODS ---------- */}
       <group ref={cushion}>
         {CUSHION_PODS.map((pos, i) => (
-          <mesh
-            key={i}
-            geometry={geo.pod}
-            material={m.cushion}
-            position={pos}
-            scale={[1.5, 0.72, 1.9]}
-          />
+          <mesh key={i} geometry={geo.pod} material={m.cushion} position={pos} scale={[1.5, 0.72, 1.9]} />
         ))}
       </group>
 
@@ -202,8 +214,8 @@ export function SneakerModel() {
           const w = laceHalfWidth(x) + 0.055;
           return (
             <group key={i}>
-              <mesh geometry={geo.eyelet} material={m.eyelet} position={[x, y, w]} rotation={[0, 0, 0]} />
-              <mesh geometry={geo.eyelet} material={m.eyelet} position={[x, y, -w]} rotation={[0, 0, 0]} />
+              <mesh geometry={geo.eyelet} material={m.eyelet} position={[x, y, w]} />
+              <mesh geometry={geo.eyelet} material={m.eyelet} position={[x, y, -w]} />
             </group>
           );
         })}
@@ -266,7 +278,7 @@ export function SneakerModel() {
         />
       </group>
 
-      <pointLight ref={energyLight} color={ACCENT} distance={2.4} intensity={0} />
+      <pointLight ref={energyLight} color={COLORWAYS[0]!.colors.glow} distance={2.4} intensity={0} />
     </group>
   );
 }
